@@ -1,40 +1,47 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(mmath LANGUAGES CXX)
-
-# Ensure we use C++20 (or newer) with modules
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_COMPILER clang++)
-# Ensure that we always compile with mold as linker and modules enabled.
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=mold")
-# Optional: disable compiler-specific extensions
+project(mmath-test)
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
+#set(CMAKE_C_COMPILER clang)
+#set(CMAKE_CXX_COMPILER clang++)
 # Force the final executable to appear in the project root:
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
-
-# Create the executable target
-add_executable(mmath)
-
-# Collect regular .cpp files
-file(GLOB CPP_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cpp")
-
-# Collect .cppm files
-file(GLOB MODULE_SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cppm")
-
-# Add both sets of sources to the executable
-target_sources(mmath
-  PRIVATE
-    ${CPP_SOURCES}
-    PRIVATE FILE_SET cxx_modules TYPE CXX_MODULES
-      BASE_DIRS "${CMAKE_SOURCE_DIR}/src"
-      FILES 
-	${MODULE_SOURCES}
+add_compile_definitions(-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES)
+add_compile_options(-fdiagnostics-color -pedantic-errors -Wall -Wextra -Wdeprecated -fexceptions
+#  -fexperimental-library -stdlib=libc++
+)
+add_link_options(-fuse-ld=lld -Wl,--color-diagnostics -fdiagnostics-color
+#  -stdlib=libc++
+#  -fexperimental-library
 )
 
-# Enable the features needed for modules
-target_compile_options(mmath 
-		PRIVATE
-		  -std=c++23)
+#add_library(std-cxx-modules STATIC)
+#set(MOD_BASE_DIR /lib/clang)
+#target_sources(std-cxx-modules
+#  PUBLIC
+#    FILE_SET moduleStd
+#    TYPE CXX_MODULES
+#    BASE_DIRS ${MOD_BASE_DIR}
+#    FILES
+#      ${MOD_BASE_DIR}/std.cppm
+#      ${MOD_BASE_DIR}/std.compat.cppm)
+#target_compile_options(std-cxx-modules
+#  PRIVATE
+#    -Wno-reserved-module-identifier
+#    -Wno-reserved-user-defined-literal)
+
+#link_libraries(std-cxx-modules)
+
+add_library(mmath)
+target_sources(mmath
+	PRIVATE	src/mmath.cpp
+	PUBLIC
+	  FILE_SET CXX_MODULES FILES src/mmath.cppm)
+
+add_executable(main)
+target_sources(main
+  PRIVATE src/main.cpp)
+target_link_libraries(main
+  PRIVATE mmath)
