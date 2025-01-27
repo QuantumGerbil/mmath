@@ -9,36 +9,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Force the final executable to appear in the project root:
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_compile_definitions(-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES)
-add_compile_options(-fdiagnostics-color -pedantic-errors -Wall -Wextra -Wdeprecated -fexceptions
-#  -fexperimental-library -stdlib=libc++
-)
-add_link_options(-fuse-ld=lld -Wl,--color-diagnostics -fdiagnostics-color
-#  -stdlib=libc++
-#  -fexperimental-library
-)
+add_compile_options(-fdiagnostics-color -pedantic-errors -Wall -Wextra -Wdeprecated -fexceptions)
+add_link_options(-fuse-ld=lld -Wl,--color-diagnostics -fdiagnostics-color)
 
-#add_library(std-cxx-modules STATIC)
-#set(MOD_BASE_DIR /lib/clang)
-#target_sources(std-cxx-modules
-#  PUBLIC
-#    FILE_SET moduleStd
-#    TYPE CXX_MODULES
-#    BASE_DIRS ${MOD_BASE_DIR}
-#    FILES
-#      ${MOD_BASE_DIR}/std.cppm
-#      ${MOD_BASE_DIR}/std.compat.cppm)
-#target_compile_options(std-cxx-modules
-#  PRIVATE
-#    -Wno-reserved-module-identifier
-#    -Wno-reserved-user-defined-literal)
-
-#link_libraries(std-cxx-modules)
+file(GLOB MODULE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cppm")
+file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 add_library(mmath)
 target_sources(mmath
-	PRIVATE	src/mmath.cpp
 	PUBLIC
-	  FILE_SET CXX_MODULES FILES src/mmath.cppm)
+	  FILE_SET CXX_MODULES
+	  FILES 
+#		src/mmath.cppm 
+#		src/mmath_vector.cppm
+		${MODULE_FILES}
+)
 
 add_executable(main)
 target_sources(main
