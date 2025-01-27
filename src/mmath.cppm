@@ -3,6 +3,7 @@ module;
 export module mmath;
 export import :vector;
 export import :matrix;
+export import :eigen;
 
 // Define and export operator<< as a free function template
 export template<typename T, std::size_t N>

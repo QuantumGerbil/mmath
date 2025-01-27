@@ -3,6 +3,21 @@ import mmath;
 
 using mmath::Vector;
 using mmath::Matrix;
+using mmath::EigenSolver;
+
+bool isSymmetric(const mmath::Matrix<double>& mat) {
+    if (mat.getRows() != mat.getCols()) return false;
+    size_t n = mat.getRows();
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < i; ++j) {
+            if (std::abs(mat(i, j) - mat(j, i)) > 1e-10) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 
 int main() {
     Vector<float, 3> v1{1.0f, 2.0f, 3.0f};
@@ -68,6 +83,29 @@ int main() {
 
         std::cout << "\nMatrix mat4 (mat2 * 2):\n";
         mat4.print();
+
+	Matrix<double> mat(3, 3);
+	mat(0, 0) = 4.0; mat(0, 1) = -2.0; mat(0, 2) = 1.0;
+	mat(1, 0) = -2.0; mat(1, 1) = 4.0; mat(1, 2) = -2.0;
+	mat(2, 0) = 1.0; mat(2, 1) = -2.0; mat(2, 2) = 3.0;
+
+	mat.print();
+
+	if (isSymmetric(mat))
+	std::cout << "Is symmetric" << std::endl;
+	else
+	std::cout << "Not symmetric" << std::endl;
+
+	mmath::EigenSolver<double> solver(mat);
+
+	auto [eigenvalues, eigenvectors] = solver.computeEigenvectors();
+
+	std::cout << "Eigenvalues:\n";
+	for (const auto& val : eigenvalues)
+        	std::cout << val << "\n";
+
+	std::cout << "\nEigenvectors:\n";
+	eigenvectors.print();
 
     return 0;
 }
