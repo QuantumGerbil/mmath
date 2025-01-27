@@ -2,7 +2,7 @@ module;
 #include <iostream>
 export module mmath:vector;
 
-export namespace mmath::vector{
+export namespace mmath{
     template<typename T, std::size_t N>
     class Vector {
       protected:
